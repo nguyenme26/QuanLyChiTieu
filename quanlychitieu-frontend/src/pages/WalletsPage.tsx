@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 export function WalletsPage() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState<Wallet | null>(null);
@@ -52,7 +52,7 @@ export function WalletsPage() {
       const response = await walletApi.getAll();
       setWallets(response.data);
     } catch (err: any) {
-      setError('Không thể tải danh sách ví');
+      toast.error('Không thể tải danh sách ví');
       toast.error('Không thể tải danh sách ví');
     } finally {
       setIsLoading(false);

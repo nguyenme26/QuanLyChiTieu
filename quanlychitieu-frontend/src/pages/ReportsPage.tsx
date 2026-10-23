@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import type { DashboardSummary, MonthlyReport, YearlyReport } from '../services/entities';
 import { reportApi } from '../services/entities';
-import { Card, CardHeader, CardBody, Button, Select, Badge, EmptyState, Spinner } from '../components/UI';
+import { Card, CardHeader, CardBody, Button, Select, Badge, EmptyState } from '../components/UI';
 import { Layout } from '../components/Layout';
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
 import { format, subMonths } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { formatCurrency, formatPercent } from '../utils/format';
@@ -11,30 +11,13 @@ import toast from 'react-hot-toast';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#6366f1', '#14b8a6', '#f97316'];
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: 'var(--shadow-lg)' }}>
-        <p style={{ fontWeight: '600', marginBottom: 'var(--space-2)' }}>{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} style={{ color: entry.color, margin: 'var(--space-1) 0', display: 'flex', gap: 'var(--space-2)' }}>
-            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: entry.color, marginTop: '4px' }} />
-            <span>{entry.name}: {formatCurrency(entry.value)}</span>
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
-
 export function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'yearly'>('dashboard');
   const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyReport | null>(null);
   const [yearlyData, setYearlyData] = useState<YearlyReport | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  
+  const [_isLoading, setIsLoading] = useState(true);
+
   // Filters
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -86,24 +69,9 @@ export function ReportsPage() {
     }
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: 'var(--shadow-lg)' }}>
-          <p style={{ fontWeight: '600', marginBottom: 'var(--space-2)' }}>{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color, margin: 'var(--space-1) 0', display: 'flex', gap: 'var(--space-2)' }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: entry.color, marginTop: '4px' }} />
-              <span>{entry.name}: {formatCurrency(entry.value)}</span>
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
-  const handleExport = async (type: 'csv' | 'excel') => {
+
+  const handleExport = async (_type: 'csv' | 'excel') => {
     try {
       // For now, we'll create a simple CSV export
       let csvContent = '';
@@ -188,17 +156,6 @@ export function ReportsPage() {
     URL.revokeObjectURL(link.href);
   };
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="loading-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-          <Spinner size="lg" />
-          <p style={{ marginTop: 'var(--space-4)', color: 'var(--text-secondary)' }}>Đang tải báo cáo...</p>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <div className="page-header">
@@ -270,6 +227,24 @@ export function ReportsPage() {
     </Layout>
   );
 }
+
+// Standalone CustomTooltip component used across report views
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: 'var(--shadow-lg)' }}>
+        <p style={{ fontWeight: '600', marginBottom: 'var(--space-2)' }}>{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} style={{ color: entry.color, margin: 'var(--space-1) 0', display: 'flex', gap: 'var(--space-2)' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: entry.color, marginTop: '4px' }} />
+            <span>{entry.name}: {formatCurrency(entry.value)}</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 // Dashboard View Component
 function DashboardView({ data }: { data: DashboardSummary }) {
@@ -346,7 +321,7 @@ function DashboardView({ data }: { data: DashboardSummary }) {
                     paddingAngle={2}
                     dataKey="balance"
                     nameKey="walletName"
-                    label={({ name, percent, value }) => {
+                    label={({ name, value }) => {
                       const walletName = name || 'Unknown';
                       const valueNum = typeof value === 'number' ? value : 0;
                       return `${walletName} ${(valueNum).toFixed(0)} VND`;
@@ -357,7 +332,7 @@ function DashboardView({ data }: { data: DashboardSummary }) {
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip formatter={((value: number | undefined) => formatCurrency(value || 0)) as any} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -374,9 +349,9 @@ function DashboardView({ data }: { data: DashboardSummary }) {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.walletBalances || []} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" vertical={false} />
-                  <XAxis type="number" tickFormatter={formatCurrency} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
+                  <XAxis type="number" tickFormatter={(value) => formatCurrency(typeof value === 'number' ? value : 0)} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
                   <YAxis dataKey="walletName" type="category" width={120} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
-                  <Tooltip content={<CustomTooltip />} formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip content={<CustomTooltip />} formatter={((value: number | undefined) => formatCurrency(value || 0)) as any} />
                   <Bar dataKey="balance" fill="var(--accent-primary)" radius={[0, 6, 6, 0]} maxBarSize={40} />
                 </BarChart>
               </ResponsiveContainer>
@@ -396,7 +371,7 @@ function DashboardView({ data }: { data: DashboardSummary }) {
           </CardHeader>
           <CardBody>
             <div className="grid grid-auto" style={{ gap: 'var(--space-4)' }}>
-              {data.budgetAlerts.map((alert, index) => (
+              {data.budgetAlerts.map((alert) => (
                 <div key={alert.budgetId} className="budget-alert-card" style={{ borderLeft: `4px solid ${alert.alertType === 'OVER_BUDGET' ? 'var(--accent-danger)' : 'var(--accent-warning)'}`, padding: 'var(--space-4)', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)' }}>
                   <div className="flex items-center justify-between">
                     <div>
@@ -485,8 +460,8 @@ function MonthlyView({ data, selectedMonth, onMonthChange }: { data: MonthlyRepo
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" />
                   <XAxis dataKey="date" tickFormatter={(d) => format(new Date(d), 'dd/MM', { locale: vi })} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
-                  <YAxis tickFormatter={formatCurrency} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
-                  <Tooltip content={<CustomTooltip />} formatter={(value: number) => formatCurrency(value)} />
+                  <YAxis tickFormatter={(value) => formatCurrency(typeof value === 'number' ? value : 0)} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
+                  <Tooltip content={<CustomTooltip />} formatter={((value: number | undefined) => formatCurrency(value || 0)) as any} />
                   <Legend />
                   <Area type="monotone" dataKey="income" name="Thu nhập" fill="url(#incomeGradient)" stroke="var(--accent-primary)" strokeWidth={2} />
                   <Area type="monotone" dataKey="expense" name="Chi tiêu" fill="url(#expenseGradient)" stroke="var(--accent-danger)" strokeWidth={2} />
@@ -526,7 +501,7 @@ function MonthlyView({ data, selectedMonth, onMonthChange }: { data: MonthlyRepo
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip formatter={((value: number | undefined) => formatCurrency(value || 0)) as any} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -659,8 +634,8 @@ function YearlyView({ data, selectedYear, onYearChange, availableYears }: { data
                 <ComposedChart data={data.monthlySummaries}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" />
                   <XAxis dataKey="monthName" stroke="var(--text-muted)" tickLine={false} axisLine={false} />
-                  <YAxis tickFormatter={formatCurrency} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
-                  <Tooltip content={<CustomTooltip />} formatter={(value: number) => formatCurrency(value)} />
+                  <YAxis tickFormatter={(value) => formatCurrency(typeof value === 'number' ? value : 0)} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
+                  <Tooltip content={<CustomTooltip />} formatter={((value: number | undefined) => formatCurrency(value || 0)) as any} />
                   <Legend />
                   <Bar dataKey="income" name="Thu nhập" fill="var(--accent-primary)" radius={[6, 6, 0, 0]} maxBarSize={30} />
                   <Bar dataKey="expense" name="Chi tiêu" fill="var(--accent-danger)" radius={[6, 6, 0, 0]} maxBarSize={30} />
@@ -681,9 +656,9 @@ function YearlyView({ data, selectedYear, onYearChange, availableYears }: { data
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.topExpenseCategories} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" vertical={false} />
-                  <XAxis type="number" tickFormatter={formatCurrency} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
+                  <XAxis type="number" tickFormatter={(value) => formatCurrency(typeof value === 'number' ? value : 0)} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
                   <YAxis dataKey="categoryName" type="category" width={140} stroke="var(--text-muted)" tickLine={false} axisLine={false} />
-                  <Tooltip content={<CustomTooltip />} formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip content={<CustomTooltip />} formatter={((value: number | undefined) => formatCurrency(value || 0)) as any} />
                   <Bar dataKey="amount" fill="var(--accent-danger)" radius={[0, 6, 6, 0]} maxBarSize={40}>
                     {data.topExpenseCategories.map((_, index) => (
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />

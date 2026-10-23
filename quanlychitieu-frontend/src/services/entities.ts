@@ -194,6 +194,12 @@ export interface CategorySpending {
   percentage: number;
 }
 
+export interface DropdownItem {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
 export interface MonthlyReport {
   year: number;
   month: number;

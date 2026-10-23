@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { DashboardSummary, Wallet, Category, Transaction, BudgetAlert, DropdownItem } from '../services/entities';
-import { reportApi, walletApi, categoryApi, transactionApi, budgetApi } from '../services/entities';
-import { StatCard, Card, CardBody, CardHeader, Button, EmptyState, Badge, Dropdown, Avatar } from '../components/UI';
+import type { DashboardSummary, Wallet, Transaction, BudgetAlert } from '../services/entities';
+import { reportApi, walletApi, transactionApi, budgetApi } from '../services/entities';
+import { StatCard, Card, CardHeader, CardBody, Button, EmptyState, Badge, Dropdown } from '../components/UI';
 import { Layout } from '../components/Layout';
 import { formatCurrency, formatRelativeTime } from '../utils/format';
 
@@ -10,7 +10,6 @@ export function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [budgetAlerts, setBudgetAlerts] = useState<BudgetAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,18 +21,17 @@ export function DashboardPage() {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      const [summaryRes, transactionsRes, walletsRes, categoriesRes, alertsRes] = await Promise.allSettled([
+      const [summaryRes, transactionsRes, walletsRes, alertsRes] = await Promise.allSettled([
         reportApi.getDashboard(),
         transactionApi.getAll({ page: 1, pageSize: 5 }),
         walletApi.getAll(),
-        categoryApi.getAll(),
         budgetApi.getAlerts(),
       ]);
 
       if (summaryRes.status === 'fulfilled') setSummary(summaryRes.value.data);
       if (transactionsRes.status === 'fulfilled') setRecentTransactions(transactionsRes.value.data.items);
       if (walletsRes.status === 'fulfilled') setWallets(walletsRes.value.data);
-      if (categoriesRes.status === 'fulfilled') setCategories(categoriesRes.value.data);
+
       if (alertsRes.status === 'fulfilled') setBudgetAlerts(alertsRes.value.data);
     } catch (err) {
       setError('Không thể tải dữ liệu. Vui lòng thử lại.');
@@ -71,7 +69,7 @@ export function DashboardPage() {
   const totalIncome = summary?.totalIncome || 0;
   const totalExpense = summary?.totalExpense || 0;
 
-  const recentWalletOptions: DropdownItem[] = wallets.slice(0, 5).map(w => ({
+  const recentWalletOptions = wallets.slice(0, 5).map(w => ({
     label: `${w.name} (${formatCurrency(w.balance)})`,
     onClick: () => {},
     icon: '👛',

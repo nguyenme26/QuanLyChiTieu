@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Category, CreateCategoryDto, UpdateCategoryDto } from '../services/entities';
 import { Card, CardHeader, CardBody, Button, Input, Modal, Badge, Avatar, EmptyState } from '../components/UI';
 import { Layout } from '../components/Layout';
-import { formatDate, getCategoryIcon } from '../utils/format';
+import { getCategoryIcon } from '../utils/format';
 import toast from 'react-hot-toast';
 import { categoryApi } from '../services/entities';
 

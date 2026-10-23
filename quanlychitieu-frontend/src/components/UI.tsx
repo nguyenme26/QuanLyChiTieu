@@ -195,7 +195,7 @@ export function CardHeader({ children, className = '' }: { children: ReactNode; 
 }
 
 export function CardBody({ children, className = '', style, ...props }: { children: ReactNode; className?: string; style?: React.CSSProperties } & React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={`card-body ${className}`}>{children}</div>;
+  return <div className={`card-body ${className}`} style={style} {...props}>{children}</div>;
 }
 
 export function CardFooter({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -451,7 +451,7 @@ export interface TooltipProps {
 
 export function Tooltip({ content, children, position = 'top' }: TooltipProps) {
   return (
-    <span className="tooltip" data-tooltip={content} style={{ '--tooltip-position': position }}>
+    <span className="tooltip" data-tooltip={content} style={{ '--tooltip-position': position } as React.CSSProperties}>
       {children}
     </span>
   );
