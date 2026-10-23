@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Button, Input, Card, CardBody, CardHeader } from '../components/UI';
+import { Button, Input } from '../components/UI';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');

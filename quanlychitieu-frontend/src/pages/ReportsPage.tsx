@@ -1,24 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import {
-  reportApi,
-  DashboardSummary, MonthlyReport, YearlyReport,
-  CategorySpending, DailyBalance, MonthlySummary
-} from '../services/entities';
-import {
-  Card, CardHeader, CardBody, Button, Select, Modal, Badge,
-  EmptyState, Spinner, formatCurrency, formatDate, formatPercent
-} from '../components/UI';
+import { useState, useEffect } from 'react';
+import type { DashboardSummary, MonthlyReport, YearlyReport } from '../services/entities';
+import { reportApi } from '../services/entities';
+import { Card, CardHeader, CardBody, Button, Select, Badge, EmptyState, Spinner } from '../components/UI';
 import { Layout } from '../components/Layout';
-import {
-  LineChart, Line, AreaChart, Area, BarChart, Bar,
-  PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, ComposedChart
-} from 'recharts';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, subMonths } from 'date-fns';
+import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
+import { format, subMonths } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { formatCurrency, formatPercent } from '../utils/format';
 import toast from 'react-hot-toast';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#6366f1', '#14b8a6', '#f97316'];
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: 'var(--shadow-lg)' }}>
+        <p style={{ fontWeight: '600', marginBottom: 'var(--space-2)' }}>{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} style={{ color: entry.color, margin: 'var(--space-1) 0', display: 'flex', gap: 'var(--space-2)' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: entry.color, marginTop: '4px' }} />
+            <span>{entry.name}: {formatCurrency(entry.value)}</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 export function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'yearly'>('dashboard');
@@ -76,6 +84,23 @@ export function ReportsPage() {
     } catch (err) {
       toast.error('Không thể tải báo cáo năm');
     }
+  };
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: 'var(--shadow-lg)' }}>
+          <p style={{ fontWeight: '600', marginBottom: 'var(--space-2)' }}>{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color, margin: 'var(--space-1) 0', display: 'flex', gap: 'var(--space-2)' }}>
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: entry.color, marginTop: '4px' }} />
+              <span>{entry.name}: {formatCurrency(entry.value)}</span>
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
   };
 
   const handleExport = async (type: 'csv' | 'excel') => {
@@ -161,23 +186,6 @@ export function ReportsPage() {
     link.download = filename;
     link.click();
     URL.revokeObjectURL(link.href);
-  };
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: 'var(--shadow-lg)' }}>
-          <p style={{ fontWeight: '600', marginBottom: 'var(--space-2)' }}>{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color, margin: 'var(--space-1) 0', display: 'flex', gap: 'var(--space-2)' }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: entry.color, marginTop: '4px' }} />
-              <span>{entry.name}: {formatCurrency(entry.value)}</span>
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
   };
 
   if (isLoading) {
@@ -338,7 +346,11 @@ function DashboardView({ data }: { data: DashboardSummary }) {
                     paddingAngle={2}
                     dataKey="balance"
                     nameKey="walletName"
-                    label={({ walletName, percent }) => `${walletName} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent, value }) => {
+                      const walletName = name || 'Unknown';
+                      const valueNum = typeof value === 'number' ? value : 0;
+                      return `${walletName} ${(valueNum).toFixed(0)} VND`;
+                    }}
                     labelLine={false}
                   >
                     {data.walletBalances?.slice(0, 8).map((_, index) => (
@@ -464,7 +476,7 @@ function MonthlyView({ data, selectedMonth, onMonthChange }: { data: MonthlyRepo
                     </linearGradient>
                     <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--accent-danger)" stopOpacity={0.3}/>
-                      <stopOffset="95%" stopColor="var(--accent-danger)" stopOpacity={0}/>
+                      <stop offset="95%" stopColor="var(--accent-danger)" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--accent-secondary)" stopOpacity={0.3}/>
@@ -503,7 +515,11 @@ function MonthlyView({ data, selectedMonth, onMonthChange }: { data: MonthlyRepo
                     paddingAngle={2}
                     dataKey="amount"
                     nameKey="categoryName"
-                    label={({ categoryName, percent }) => `${categoryName} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, value }) => {
+                      const categoryName = name || 'Unknown';
+                      const valueNum = typeof value === 'number' ? value : 0;
+                      return `${categoryName} ${(valueNum).toFixed(0)} VND`;
+                    }}
                     labelLine={false}
                   >
                     {data.expenseByCategory.map((_, index) => (

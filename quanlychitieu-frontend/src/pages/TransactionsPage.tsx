@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  transactionApi, walletApi, categoryApi,
-  Transaction, CreateTransactionDto, UpdateTransactionDto, TransactionFilter, PagedResult,
-  Wallet, Category
-} from '../services/entities';
-import { 
-  Card, CardHeader, CardBody, Button, Input, Select, Modal, Badge, 
-  EmptyState, Dropdown, DropdownItem, Spinner, formatCurrency, formatDate, formatRelativeTime
-} from '../components/UI';
+import { useState, useEffect } from 'react';
+import type { Transaction, CreateTransactionDto, UpdateTransactionDto, TransactionFilter, Category, Wallet } from '../services/entities';
+import { transactionApi, walletApi, categoryApi } from '../services/entities';
+import { Card, CardHeader, CardBody, Button, Input, Select, Modal, EmptyState, Dropdown, Spinner } from '../components/UI';
 import { Layout } from '../components/Layout';
+import { formatCurrency, formatDate } from '../utils/format';
 import toast from 'react-hot-toast';
 
 export function TransactionsPage() {
@@ -16,7 +11,6 @@ export function TransactionsPage() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   
   // Filters & pagination
   const [filter, setFilter] = useState<TransactionFilter>({
@@ -71,9 +65,6 @@ export function TransactionsPage() {
       ]);
       setWallets(walletsRes.data);
       setCategories(categoriesRes.data);
-    } catch (err: any) {
-      setError('Không thể tải dữ liệu');
-      toast.error('Không thể tải dữ liệu');
     } finally {
       setIsLoading(false);
     }
@@ -255,10 +246,10 @@ export function TransactionsPage() {
             <h3 style={{ fontSize: '1.125rem', fontWeight: '600' }}>Danh sách giao dịch ({totalCount})</h3>
             <div className="flex items-center gap-2">
               <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                Trang {filter.page} / {totalPages || 1}
-              </span>
-              <Button variant="ghost" size="sm" onClick={() => goToPage(filter.page - 1)} disabled={filter.page <= 1}>‹</Button>
-              <Button variant="ghost" size="sm" onClick={() => goToPage(filter.page + 1)} disabled={filter.page >= totalPages}›</Button>
+                              Trang {filter.page!} / {totalPages || 1}
+                            </span>
+              <Button variant="ghost" size="sm" onClick={() => goToPage(filter.page! - 1)} disabled={filter.page! <= 1}>‹</Button>
+                            <Button variant="ghost" size="sm" onClick={() => goToPage(filter.page! + 1)} disabled={filter.page! >= totalPages}>›</Button>
             </div>
           </div>
         </CardHeader>

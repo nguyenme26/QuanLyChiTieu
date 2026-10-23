@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { categoryApi, Category, CreateCategoryDto, UpdateCategoryDto } from '../services/entities';
-import { 
-  Card, CardHeader, CardBody, Button, Input, Select, Modal, Badge, 
-  EmptyState, Dropdown, DropdownItem, Avatar 
-} from '../components/UI';
+import { useEffect, useState } from 'react';
+import type { Category, CreateCategoryDto, UpdateCategoryDto } from '../services/entities';
+import { Card, CardHeader, CardBody, Button, Input, Modal, Badge, Avatar, EmptyState } from '../components/UI';
 import { Layout } from '../components/Layout';
-import { formatDate, getCategoryIcon, getCategoryColor } from '../utils/format';
+import { formatDate, getCategoryIcon } from '../utils/format';
 import toast from 'react-hot-toast';
+import { categoryApi } from '../services/entities';
 
 export function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [filterIncome, setFilterIncome] = useState<boolean | null>(null);
   
   // Modals
@@ -48,9 +45,6 @@ export function CategoriesPage() {
       setIsLoading(true);
       const response = await categoryApi.getAll(filterIncome ?? undefined);
       setCategories(response.data);
-    } catch (err: any) {
-      setError('Không thể tải danh mục');
-      toast.error('Không thể tải danh mục');
     } finally {
       setIsLoading(false);
     }

@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { walletApi, Wallet, CreateWalletDto, UpdateWalletDto, TransferDto, WalletBalance } from '../services/entities';
-import { 
-  Card, CardHeader, CardBody, Button, Input, Select, Modal, Badge, 
-  EmptyState, Avatar, Dropdown, DropdownItem, Spinner 
-} from '../components/UI';
+import { useEffect, useState } from 'react';
+import type { Wallet, CreateWalletDto, UpdateWalletDto, TransferDto } from '../services/entities';
+import { walletApi } from '../services/entities';
+import { Card, CardHeader, CardBody, Button, Input, Select, Modal, Badge, EmptyState, Avatar, Dropdown, Spinner } from '../components/UI';
 import { Layout } from '../components/Layout';
 import { formatCurrency, formatDate } from '../utils/format';
 import toast from 'react-hot-toast';
@@ -11,7 +9,6 @@ import toast from 'react-hot-toast';
 export function WalletsPage() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);

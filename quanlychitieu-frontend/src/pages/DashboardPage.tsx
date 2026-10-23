@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { reportApi, walletApi, categoryApi, transactionApi, budgetApi, DashboardSummary, Wallet, Category, Transaction, BudgetAlert } from '../services/entities';
-import { StatCard, Card, CardBody, CardHeader, Button, EmptyState, Badge, Dropdown, DropdownItem, Avatar } from '../components/UI';
+import type { DashboardSummary, Wallet, Category, Transaction, BudgetAlert, DropdownItem } from '../services/entities';
+import { reportApi, walletApi, categoryApi, transactionApi, budgetApi } from '../services/entities';
+import { StatCard, Card, CardBody, CardHeader, Button, EmptyState, Badge, Dropdown, Avatar } from '../components/UI';
 import { Layout } from '../components/Layout';
-import { formatCurrency, formatDate, formatRelativeTime } from '../utils/format';
+import { formatCurrency, formatRelativeTime } from '../utils/format';
 
 export function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);

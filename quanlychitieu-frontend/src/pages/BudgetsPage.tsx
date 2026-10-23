@@ -1,21 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  budgetApi, categoryApi, walletApi,
-  Budget, CreateBudgetDto, UpdateBudgetDto, BudgetAlert,
-  Category, Wallet
-} from '../services/entities';
-import { 
-  Card, CardHeader, CardBody, Button, Input, Select, Modal, Badge, 
-  EmptyState, Spinner, formatCurrency, formatDate
-} from '../components/UI';
+import { useState, useEffect } from 'react';
+import type { Budget, CreateBudgetDto, UpdateBudgetDto, Category, Wallet } from '../services/entities';
+import { Card, CardHeader, CardBody, Button, Input, Select, Modal, Badge, EmptyState, Spinner } from '../components/UI';
+import { formatCurrency, formatDate } from '../utils/format';
 import { Layout } from '../components/Layout';
 import toast from 'react-hot-toast';
+import { budgetApi, categoryApi, walletApi } from '../services/entities';
 
 export function BudgetsPage() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [alerts, setAlerts] = useState<BudgetAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Modals
@@ -52,17 +46,15 @@ export function BudgetsPage() {
   const loadInitialData = async () => {
     try {
       setIsLoading(true);
-      const [budgetsRes, categoriesRes, walletsRes, alertsRes] = await Promise.allSettled([
+      const [budgetsRes, categoriesRes, walletsRes] = await Promise.allSettled([
         budgetApi.getAll(),
         categoryApi.getAll(false), // Only expense categories for budgets
         walletApi.getAll(),
-        budgetApi.getAlerts(),
       ]);
       
       if (budgetsRes.status === 'fulfilled') setBudgets(budgetsRes.value.data);
       if (categoriesRes.status === 'fulfilled') setCategories(categoriesRes.value.data.filter(c => c.isActive));
       if (walletsRes.status === 'fulfilled') setWallets(walletsRes.value.data.filter(w => w.isActive));
-      if (alertsRes.status === 'fulfilled') setAlerts(alertsRes.value.data);
     } catch (err: any) {
       toast.error('Không thể tải dữ liệu');
     } finally {

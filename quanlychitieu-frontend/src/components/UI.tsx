@@ -1,4 +1,4 @@
-import React, { ReactNode, forwardRef } from 'react';
+import React, { type ReactNode, forwardRef } from 'react';
 
 // Button Component
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -8,6 +8,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  danger?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -171,6 +172,7 @@ export interface CardProps {
   className?: string;
   hover?: boolean;
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  style?: React.CSSProperties;
 }
 
 export function Card({ children, className = '', hover = false, padding = 'md' }: CardProps) {
@@ -192,7 +194,7 @@ export function CardHeader({ children, className = '' }: { children: ReactNode; 
   return <div className={`card-header ${className}`}>{children}</div>;
 }
 
-export function CardBody({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function CardBody({ children, className = '', style, ...props }: { children: ReactNode; className?: string; style?: React.CSSProperties } & React.HTMLAttributes<HTMLDivElement>) {
   return <div className={`card-body ${className}`}>{children}</div>;
 }
 
@@ -268,6 +270,7 @@ export interface BadgeProps {
   children: ReactNode;
   variant?: 'primary' | 'warning' | 'danger' | 'info' | 'gray';
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export function Badge({ children, variant = 'primary', className = '' }: BadgeProps) {
@@ -285,6 +288,8 @@ export interface AvatarProps {
   name?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  children?: ReactNode;
+  style?: React.CSSProperties;
 }
 
 export function Avatar({ src, alt, name, size = 'md', className = '' }: AvatarProps) {
