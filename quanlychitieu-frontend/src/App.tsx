@@ -24,20 +24,6 @@ function ProtectedRoute({ children }: { children?: React.ReactNode }) {
   return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to="/login" replace />;
 }
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <div className="spinner spinner-lg"></div>
-      </div>
-    );
-  }
-
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <>{children}</>;
-}
-
 function AppRoutes() {
   return (
     <Routes>
