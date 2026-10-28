@@ -203,6 +203,70 @@ namespace QuanLyChiTieuAPI.Data
             {
                 modelBuilder.Entity<Transaction>().HasData(t);
             }
+
+            // Seed random transactions for reporting (2024-2026)
+            SeedRandomTransactions(modelBuilder);
+        }
+
+        private void SeedRandomTransactions(ModelBuilder modelBuilder)
+        {
+            var rng = new Random(42); // Fixed seed for reproducibility
+            var categories = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var wallets = new int[] { 1, 2 };
+            var isIncomes = new bool[] { true, false };
+            var noteSuffixes = new string[]
+            {
+                "tháng 1", "tháng 2", "tháng 3", "tháng 4", "tháng 5", "tháng 6",
+                "tháng 7", "tháng 8", "tháng 9", "tháng 10", "tháng 11", "tháng 12"
+            };
+
+            // Generate 500-800 random transactions from 2024 to 2026
+            var totalTransactions = rng.Next(500, 801);
+            var count = 0;
+            var startDate = new DateTime(2024, 1, 1);
+            var endDate = new DateTime(2026, 12, 31);
+
+            for (var i = 0; i < totalTransactions; i++)
+            {
+                // Random date between 2024 and 2026
+                var yearOffset = rng.Next(0, 3);
+                var month = rng.Next(1, 13);
+                var day = rng.Next(1, 29);
+                var date = new DateTime(2024 + yearOffset, month, day > 28 ? 28 : day);
+
+                // Random category
+                var categoryId = categories[rng.Next(categories.Length)];
+
+                // Random wallet
+                var walletId = wallets[rng.Next(wallets.Length)];
+
+                // Random amount
+                var isIncome = isIncomes[rng.Next(isIncomes.Length)];
+                var amount = isIncome
+                    ? rng.Next(2000000, 30000001)  // Income: 2M - 30M VND
+                    : rng.Next(20000, 5000001);    // Expense: 20K - 5M VND
+
+                // Random note
+                var noteSuffix = noteSuffixes[rng.Next(noteSuffixes.Length)];
+                var note = isIncome ? "Thu nhập" : "Chi tiêu";
+
+                var transaction = new Transaction
+                {
+                    Id = 1000 + i,
+                    Amount = amount,
+                    Note = note + " " + noteSuffix,
+                    IsIncome = isIncome,
+                    WalletId = walletId,
+                    CategoryId = categoryId,
+                    UserId = 1,
+                    TransactionDate = date,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                modelBuilder.Entity<Transaction>().HasData(transaction);
+                count++;
+            }
         }
     }
 }
