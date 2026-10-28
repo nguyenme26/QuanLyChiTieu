@@ -175,6 +175,34 @@ namespace QuanLyChiTieuAPI.Data
                 new Budget { Id = 3, Name = "Mua sắm", Amount = 8000000, CategoryId = 7, WalletId = 2, UserId = 1, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
                 new Budget { Id = 4, Name = "Giáo dục", Amount = 3000000, CategoryId = 10, WalletId = 2, UserId = 1, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate }
             );
+
+            // Sample transactions
+            var today = DateTime.Today;
+            var transactions = new List<Transaction>
+            {
+                // Income - Lương (Wallet 1: Tiền mặt)
+                new Transaction { Id = 1, Amount = 10000000, Note = "Lương tháng 10", IsIncome = true, WalletId = 1, CategoryId = 1, UserId = 1, TransactionDate = today.AddDays(-5), CreatedAt = today, UpdatedAt = today },
+                new Transaction { Id = 2, Amount = 3000000, Note = "Thưởng", IsIncome = true, WalletId = 1, CategoryId = 2, UserId = 1, TransactionDate = today.AddDays(-2), CreatedAt = today, UpdatedAt = today },
+
+                // Expense - Ăn uống (Wallet 1: Tiền mặt)
+                new Transaction { Id = 3, Amount = 850000, Note = "Ăn uống", IsIncome = false, WalletId = 1, CategoryId = 5, UserId = 1, TransactionDate = today.AddDays(-4), CreatedAt = today, UpdatedAt = today },
+                new Transaction { Id = 4, Amount = 620000, Note = "Ăn uống", IsIncome = false, WalletId = 1, CategoryId = 5, UserId = 1, TransactionDate = today.AddDays(-3), CreatedAt = today, UpdatedAt = today },
+
+                // Expense - Mua sắm (Wallet 2: Thẻ Ngân hàng)
+                new Transaction { Id = 5, Amount = 2500000, Note = "Mua sắm", IsIncome = false, WalletId = 2, CategoryId = 7, UserId = 1, TransactionDate = today.AddDays(-6), CreatedAt = today, UpdatedAt = today },
+                new Transaction { Id = 6, Amount = 1800000, Note = "Mua sắm", IsIncome = false, WalletId = 2, CategoryId = 7, UserId = 1, TransactionDate = today.AddDays(-1), CreatedAt = today, UpdatedAt = today },
+
+                // Expense - Di chuyển
+                new Transaction { Id = 7, Amount = 450000, Note = "Di chuyển", IsIncome = false, WalletId = 1, CategoryId = 6, UserId = 1, TransactionDate = today.AddDays(-2), CreatedAt = today, UpdatedAt = today },
+
+                // Expense - Tiện ích
+                new Transaction { Id = 8, Amount = 1200000, Note = "Tiện ích", IsIncome = false, WalletId = 2, CategoryId = 11, UserId = 1, TransactionDate = today.AddDays(-1), CreatedAt = today, UpdatedAt = today }
+            };
+
+            foreach (var t in transactions)
+            {
+                modelBuilder.Entity<Transaction>().HasData(t);
+            }
         }
     }
 }
