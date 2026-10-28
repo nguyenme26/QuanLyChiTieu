@@ -204,15 +204,52 @@ namespace QuanLyChiTieuAPI.Data
                 modelBuilder.Entity<Transaction>().HasData(t);
             }
 
+            // Seed user account: ngienme892@gmail.com
+            SeedUserAccountData(modelBuilder);
+
             // Seed random transactions for reporting (2024-2026)
             SeedRandomTransactions(modelBuilder);
+        }
+
+        private void SeedUserAccountData(ModelBuilder modelBuilder)
+        {
+            var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword("nct071126");
+
+            // Create user ngienme892@gmail.com
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 2,
+                    FullName = "Nguyen Van A",
+                    Email = "nguyenme892@gmail.com",
+                    PasswordHash = passwordHash,
+                    IsActive = true,
+                    CreatedAt = seedDate,
+                    UpdatedAt = seedDate
+                }
+            );
+
+            // Create 3 wallets for nguyenme892@gmail.com
+            modelBuilder.Entity<Wallet>().HasData(
+                new Wallet { Id = 3, Name = "Tiền mặt", Balance = 15000000, Currency = "VND", IsDefault = true, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Wallet { Id = 4, Name = "Tài khoản ngân hàng", Balance = 85000000, Currency = "VND", IsDefault = false, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Wallet { Id = 5, Name = "Thẻ tín dụng", Balance = -5000000, Currency = "VND", IsDefault = false, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate }
+            );
+
+            // Create 3 budgets for nguyenme892@gmail.com
+            modelBuilder.Entity<Budget>().HasData(
+                new Budget { Id = 5, Name = "Dự phòng", Amount = 50000000, CategoryId = 1, WalletId = 3, UserId = 2, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Budget { Id = 6, Name = "Ăn uống", Amount = 3000000, CategoryId = 5, WalletId = 3, UserId = 2, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Budget { Id = 7, Name = "Mua sắm", Amount = 5000000, CategoryId = 7, WalletId = 4, UserId = 2, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate }
+            );
         }
 
         private void SeedRandomTransactions(ModelBuilder modelBuilder)
         {
             var rng = new Random(42); // Fixed seed for reproducibility
             var categories = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-            var wallets = new int[] { 1, 2 };
+            var wallets = new int[] { 3, 4, 5 };  // Wallets for nguyenme892@gmail.com (Ids 3, 4, 5)
             var isIncomes = new bool[] { true, false };
             var noteSuffixes = new string[]
             {
@@ -237,7 +274,7 @@ namespace QuanLyChiTieuAPI.Data
                 // Random category
                 var categoryId = categories[rng.Next(categories.Length)];
 
-                // Random wallet
+                // Random wallet (3, 4, 5)
                 var walletId = wallets[rng.Next(wallets.Length)];
 
                 // Random amount
@@ -252,13 +289,13 @@ namespace QuanLyChiTieuAPI.Data
 
                 var transaction = new Transaction
                 {
-                    Id = 1000 + i,
+                    Id = 2000 + i,
                     Amount = amount,
                     Note = note + " " + noteSuffix,
                     IsIncome = isIncome,
                     WalletId = walletId,
                     CategoryId = categoryId,
-                    UserId = 1,
+                    UserId = 2,  // This is for nguyenme892@gmail.com (UserId = 2)
                     TransactionDate = date,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
