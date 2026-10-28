@@ -142,5 +142,39 @@ namespace QuanLyChiTieuAPI.Data
                 new Category { Id = 12, Name = "Khác (Chi)", Description = "Chi tiêu khác", Icon = "💸", Color = "#607D8B", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate }
             );
         }
+
+        private void SeedSampleData(ModelBuilder modelBuilder)
+        {
+            var demoPasswordHash = BCrypt.Net.BCrypt.HashPassword("demo123");
+            var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            // Sample user
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    FullName = "Demo User",
+                    Email = "demo@example.com",
+                    PasswordHash = demoPasswordHash,
+                    IsActive = true,
+                    CreatedAt = seedDate,
+                    UpdatedAt = seedDate
+                }
+            );
+
+            // Sample wallets
+            modelBuilder.Entity<Wallet>().HasData(
+                new Wallet { Id = 1, Name = "Tiền mặt", Balance = 5000000, Currency = "VND", IsDefault = true, UserId = 1, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Wallet { Id = 2, Name = "Thẻ Ngân hàng", Balance = 20000000, Currency = "VND", IsDefault = false, UserId = 1, CreatedAt = seedDate, UpdatedAt = seedDate }
+            );
+
+            // Sample budgets
+            modelBuilder.Entity<Budget>().HasData(
+                new Budget { Id = 1, Name = "Dự phòng", Amount = 10000000, CategoryId = 1, WalletId = 1, UserId = 1, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Budget { Id = 2, Name = "Ăn uống", Amount = 5000000, CategoryId = 5, WalletId = 1, UserId = 1, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Budget { Id = 3, Name = "Mua sắm", Amount = 8000000, CategoryId = 7, WalletId = 2, UserId = 1, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Budget { Id = 4, Name = "Giáo dục", Amount = 3000000, CategoryId = 10, WalletId = 2, UserId = 1, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate }
+            );
+        }
     }
 }
