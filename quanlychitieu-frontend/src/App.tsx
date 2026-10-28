@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardPage } from './pages/DashboardPage';
 import { LoginPage, RegisterPage } from './pages/AuthPages';
 import { WalletsPage } from './pages/WalletsPage';
@@ -30,9 +30,7 @@ function AppRoutes() {
 
 function App() {
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <AppRoutes />
   );
 }
 
