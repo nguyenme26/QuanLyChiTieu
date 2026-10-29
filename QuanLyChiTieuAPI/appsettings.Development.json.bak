@@ -1,0 +1,18 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore.Database.Command": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=QuanLyChiTieuDb;Trusted_Connection=True;MultipleActiveResultSets=true"
+  },
+  "JwtSettings": {
+    "SecretKey": "YourSuperSecretKeyHereThatIsAtLeast32CharactersLong!",
+    "Issuer": "QuanLyChiTieuAPI",
+    "Audience": "QuanLyChiTieuClient",
+    "ExpiryInMinutes": 60
+  }
+}

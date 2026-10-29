@@ -127,9 +127,7 @@ namespace QuanLyChiTieuAPI.Data
             // System categories for income
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Lương", Description = "Thu nhập từ lương", Icon = "💰", Color = "#4CAF50", IsIncome = true, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
-                new Category { Id = 2, Name = "Thưởng", Description = "Thu nhập từ thưởng", Icon = "🎁", Color = "#8BC34A", IsIncome = true, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
-                new Category { Id = 3, Name = "Đầu tư", Description = "Thu nhập từ đầu tư", Icon = "📈", Color = "#CDDC39", IsIncome = true, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
-                new Category { Id = 4, Name = "Khác (Thu)", Description = "Thu nhập khác", Icon = "💵", Color = "#FFEB3B", IsIncome = true, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Category { Id = 13, Name = "Tiền gửi", Description = "Thu nhập từ tiền gửi", Icon = "🏦", Color = "#2196F3", IsIncome = true, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
 
                 // System categories for expense
                 new Category { Id = 5, Name = "Ăn uống", Description = "Chi tiêu ăn uống", Icon = "🍔", Color = "#FF5722", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
@@ -138,10 +136,12 @@ namespace QuanLyChiTieuAPI.Data
                 new Category { Id = 8, Name = "Giải trí", Description = "Chi tiêu giải trí", Icon = "🎮", Color = "#9C27B0", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
                 new Category { Id = 9, Name = "Y tế", Description = "Chi tiêu y tế", Icon = "🏥", Color = "#F44336", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
                 new Category { Id = 10, Name = "Giáo dục", Description = "Chi tiêu giáo dục", Icon = "📚", Color = "#3F51B5", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
-                new Category { Id = 11, Name = "Tiện ích", Description = "Chi tiêu tiện ích", Icon = "💡", Color = "#2196F3", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate },
-                new Category { Id = 12, Name = "Khác (Chi)", Description = "Chi tiêu khác", Icon = "💸", Color = "#607D8B", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate }
-            );
-        }
+                new Category { Id = 12, Name = "Khác", Description = "Chi tiêu khác", Icon = "💸", Color = "#607D8B", IsIncome = false, IsSystem = true, IsActive = true, CreatedAt = seedDate, UpdatedAt = seedDate }
+                );
+
+                // Seed sample data for nguyenme892@gmail.com
+                SeedSampleData(modelBuilder);
+                }
 
         private void SeedSampleData(ModelBuilder modelBuilder)
         {
@@ -182,7 +182,7 @@ namespace QuanLyChiTieuAPI.Data
             {
                 // Income - Lương (Wallet 1: Tiền mặt)
                 new Transaction { Id = 1, Amount = 10000000, Note = "Lương tháng 10", IsIncome = true, WalletId = 1, CategoryId = 1, UserId = 1, TransactionDate = today.AddDays(-5), CreatedAt = today, UpdatedAt = today },
-                new Transaction { Id = 2, Amount = 3000000, Note = "Thưởng", IsIncome = true, WalletId = 1, CategoryId = 2, UserId = 1, TransactionDate = today.AddDays(-2), CreatedAt = today, UpdatedAt = today },
+                new Transaction { Id = 2, Amount = 3000000, Note = "Thưởng", IsIncome = true, WalletId = 1, CategoryId = 13, UserId = 1, TransactionDate = today.AddDays(-2), CreatedAt = today, UpdatedAt = today },
 
                 // Expense - Ăn uống (Wallet 1: Tiền mặt)
                 new Transaction { Id = 3, Amount = 850000, Note = "Ăn uống", IsIncome = false, WalletId = 1, CategoryId = 5, UserId = 1, TransactionDate = today.AddDays(-4), CreatedAt = today, UpdatedAt = today },
@@ -195,8 +195,8 @@ namespace QuanLyChiTieuAPI.Data
                 // Expense - Di chuyển
                 new Transaction { Id = 7, Amount = 450000, Note = "Di chuyển", IsIncome = false, WalletId = 1, CategoryId = 6, UserId = 1, TransactionDate = today.AddDays(-2), CreatedAt = today, UpdatedAt = today },
 
-                // Expense - Tiện ích
-                new Transaction { Id = 8, Amount = 1200000, Note = "Tiện ích", IsIncome = false, WalletId = 2, CategoryId = 11, UserId = 1, TransactionDate = today.AddDays(-1), CreatedAt = today, UpdatedAt = today }
+                // Expense - Khác (no category specific)
+                new Transaction { Id = 8, Amount = 1200000, Note = "Tiện ích", IsIncome = false, WalletId = 2, CategoryId = 12, UserId = 1, TransactionDate = today.AddDays(-1), CreatedAt = today, UpdatedAt = today }
             };
 
             foreach (var t in transactions)
@@ -248,13 +248,25 @@ namespace QuanLyChiTieuAPI.Data
         private void SeedRandomTransactions(ModelBuilder modelBuilder)
         {
             var rng = new Random(42); // Fixed seed for reproducibility
-            var categories = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var incomeCategories = new int[] { 1, 13 };  // Lương, Tiền gửi
+            var expenseCategories = new int[] { 5, 6, 7, 8, 9, 10, 12 };  // Expense categories
             var wallets = new int[] { 3, 4, 5 };  // Wallets for nguyenme892@gmail.com (Ids 3, 4, 5)
-            var isIncomes = new bool[] { true, false };
-            var noteSuffixes = new string[]
+            var noteSuffixes = new string[] 
             {
                 "tháng 1", "tháng 2", "tháng 3", "tháng 4", "tháng 5", "tháng 6",
                 "tháng 7", "tháng 8", "tháng 9", "tháng 10", "tháng 11", "tháng 12"
+            };
+
+            // Expense ranges per category (in VND)
+            var expenseRanges = new Dictionary<int, (int min, int max)>
+            {
+                { 5, (50000, 200000) },    // Ăn uống
+                { 6, (100000, 500000) },   // Di chuyển
+                { 7, (100000, 500000) },   // Mua sắm
+                { 8, (10000, 200000) },    // Giải trí
+                { 9, (100000, 1000000) },  // Y tế
+                { 10, (100000, 300000) },  // Giáo dục
+                { 12, (10000, 1000000) }   // Khác
             };
 
             // Generate 500-800 random transactions from 2024 to 2026
@@ -271,17 +283,19 @@ namespace QuanLyChiTieuAPI.Data
                 var day = rng.Next(1, 29);
                 var date = new DateTime(2024 + yearOffset, month, day > 28 ? 28 : day);
 
-                // Random category
-                var categoryId = categories[rng.Next(categories.Length)];
+                // Random category (income or expense)
+                var categoryId = rng.Next(0, 2) == 0
+                    ? incomeCategories[rng.Next(incomeCategories.Length)]
+                    : expenseCategories[rng.Next(expenseCategories.Length)];
 
                 // Random wallet (3, 4, 5)
                 var walletId = wallets[rng.Next(wallets.Length)];
 
-                // Random amount
-                var isIncome = isIncomes[rng.Next(isIncomes.Length)];
+                // Random amount based on category type
+                var isIncome = categoryId == 1 || categoryId == 13;
                 var amount = isIncome
-                    ? rng.Next(2000000, 30000001)  // Income: 2M - 30M VND
-                    : rng.Next(20000, 5000001);    // Expense: 20K - 5M VND
+                    ? (categoryId == 1 ? rng.Next(25000000, 30000001) : rng.Next(500000, 5000001))
+                    : rng.Next(expenseRanges[categoryId].min, expenseRanges[categoryId].max + 1);
 
                 // Random note
                 var noteSuffix = noteSuffixes[rng.Next(noteSuffixes.Length)];
