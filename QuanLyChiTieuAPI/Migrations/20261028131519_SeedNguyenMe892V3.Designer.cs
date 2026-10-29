@@ -12,8 +12,8 @@ using QuanLyChiTieuAPI.Data;
 namespace QuanLyChiTieuAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261028111004_SeedNguyenMe892Account")]
-    partial class SeedNguyenMe892Account
+    [Migration("20261028131519_SeedNguyenMe892V3")]
+    partial class SeedNguyenMe892V3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

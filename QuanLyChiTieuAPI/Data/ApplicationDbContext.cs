@@ -232,9 +232,9 @@ namespace QuanLyChiTieuAPI.Data
 
             // Create 3 wallets for nguyenme892@gmail.com
             modelBuilder.Entity<Wallet>().HasData(
-                new Wallet { Id = 3, Name = "Tiền mặt", Balance = 15000000, Currency = "VND", IsDefault = true, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate },
-                new Wallet { Id = 4, Name = "Tài khoản ngân hàng", Balance = 85000000, Currency = "VND", IsDefault = false, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate },
-                new Wallet { Id = 5, Name = "Thẻ tín dụng", Balance = -5000000, Currency = "VND", IsDefault = false, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate }
+                new Wallet { Id = 3, Name = "Tiền mặt", Balance = 15000000, Currency = "VND", IsDefault = true, IsActive = true, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Wallet { Id = 4, Name = "Tài khoản ngân hàng", Balance = 85000000, Currency = "VND", IsDefault = false, IsActive = true, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate },
+                new Wallet { Id = 5, Name = "Thẻ tín dụng", Balance = -5000000, Currency = "VND", IsDefault = false, IsActive = true, UserId = 2, CreatedAt = seedDate, UpdatedAt = seedDate }
             );
 
             // Create 3 budgets for nguyenme892@gmail.com

@@ -79,6 +79,29 @@ namespace QuanLyChiTieuAPI.DTOs
         public ReportType ReportType { get; set; } = ReportType.Transactions;
     }
 
+    public class ExportResultDto
+    {
+        public ReportType ReportType { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int? WalletId { get; set; }
+        public int TransactionCount { get; set; }
+        public decimal TotalIncome { get; set; }
+        public decimal TotalExpense { get; set; }
+        public List<ExportTransactionDto> Transactions { get; set; } = new();
+    }
+
+    public class ExportTransactionDto
+    {
+        public int Id { get; set; }
+        public string Note { get; set; } = string.Empty;
+        public DateTime TransactionDate { get; set; }
+        public bool IsIncome { get; set; }
+        public decimal Amount { get; set; }
+        public string WalletName { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = string.Empty;
+    }
+
     public enum ReportType
     {
         Transactions,

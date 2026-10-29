@@ -83,5 +83,24 @@ namespace QuanLyChiTieuAPI.Controllers
             }
             return userId;
         }
+
+        [HttpGet("export")]
+        public async Task<ActionResult<ExportResultDto>> Export([FromQuery] ExportRequestDto request)
+        {
+            try
+            {
+                var userId = GetUserId();
+                var report = await _reportsService.GetExportReportAsync(userId, request);
+                return Ok(report);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Có lỗi xảy ra", error = ex.Message });
+            }
+        }
     }
 }

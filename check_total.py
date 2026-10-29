@@ -1,0 +1,4 @@
+import subprocess
+result = subprocess.run(['sqlcmd', '-S', '.\\SQLEXPRESS', '-d', 'QuanLyChiTieuDb', '-Q', "SET QUOTED_IDENTIFIER ON; SELECT COUNT(*) AS Total FROM Transactions;"], capture_output=True, text=True, errors='replace')
+print('STDOUT:', result.stdout)
+print('STDERR:', result.stderr)
