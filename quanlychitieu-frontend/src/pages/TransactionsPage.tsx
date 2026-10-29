@@ -88,6 +88,15 @@ export function TransactionsPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
+      // Validate required fields
+      if (!createForm.walletId) {
+        toast.error('Vui lòng chọn ví (Wallet)');
+        return;
+      }
+      if (!createForm.categoryId) {
+        toast.error('Vui lòng chọn danh mục');
+        return;
+      }
       const payload = { ...createForm, amount: Number(createForm.amount), walletId: Number(createForm.walletId), categoryId: Number(createForm.categoryId) };
       const response = await transactionApi.create(payload);
       setTransactions(prev => [response.data, ...prev]);
@@ -153,7 +162,7 @@ export function TransactionsPage() {
       note: '',
       transactionDate: new Date().toISOString().split('T')[0],
       isIncome: false,
-      walletId: wallets[0]?.id || 0,
+      walletId: wallets[0]?.id || 3,
       categoryId: 0,
     });
   };
