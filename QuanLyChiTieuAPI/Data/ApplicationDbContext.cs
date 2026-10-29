@@ -248,8 +248,6 @@ namespace QuanLyChiTieuAPI.Data
         private void SeedRandomTransactions(ModelBuilder modelBuilder)
         {
             var rng = new Random(42); // Fixed seed for reproducibility
-            var incomeCategories = new int[] { 1, 13 };  // Lương, Tiền gửi
-            var expenseCategories = new int[] { 5, 6, 7, 8, 9, 10, 12 };  // Expense categories
             var wallets = new int[] { 3, 4, 5 };  // Wallets for nguyenme892@gmail.com (Ids 3, 4, 5)
             var noteSuffixes = new string[] 
             {
@@ -268,55 +266,84 @@ namespace QuanLyChiTieuAPI.Data
                 { 10, (100000, 300000) },  // Giáo dục
                 { 12, (10000, 1000000) }   // Khác
             };
+            var expenseCategories = new int[] { 5, 6, 7, 8, 9, 10, 12 };  // Expense category IDs
 
-            // Generate 500-800 random transactions from 2024 to 2026
-            var totalTransactions = rng.Next(500, 801);
-            var count = 0;
+            // Generate 1 salary per month from 2024-01 to 2026-10 (TotalIncome)
+            // Each salary is random between 25,000,000 - 30,000,000 VND
             var startDate = new DateTime(2024, 1, 1);
-            var endDate = new DateTime(2026, 12, 31);
+            var endDate = new DateTime(2026, 10, 29);
+            var count = 0;
+            var date = new DateTime(2024, 1, 1);
 
-            for (var i = 0; i < totalTransactions; i++)
+            // Generate income (salary) transactions
+            while (date <= endDate)
             {
-                // Random date between 2024 and 2026
-                var yearOffset = rng.Next(0, 3);
-                var month = rng.Next(1, 13);
-                var day = rng.Next(1, 29);
-                var date = new DateTime(2024 + yearOffset, month, day > 28 ? 28 : day);
+                // Random day within the month
+                var lastDay = new DateTime(date.Year, date.Month, 1).AddMonths(1).AddDays(-1);
+                var day = rng.Next(1, lastDay.Day + 1);
+                var transactionDate = new DateTime(date.Year, date.Month, day);
 
-                // Random category (income or expense)
-                var categoryId = rng.Next(0, 2) == 0
-                    ? incomeCategories[rng.Next(incomeCategories.Length)]
-                    : expenseCategories[rng.Next(expenseCategories.Length)];
-
-                // Random wallet (3, 4, 5)
-                var walletId = wallets[rng.Next(wallets.Length)];
-
-                // Random amount based on category type
-                var isIncome = categoryId == 1 || categoryId == 13;
-                var amount = isIncome
-                    ? (categoryId == 1 ? rng.Next(25000000, 30000001) : rng.Next(500000, 5000001))
-                    : rng.Next(expenseRanges[categoryId].min, expenseRanges[categoryId].max + 1);
-
-                // Random note
-                var noteSuffix = noteSuffixes[rng.Next(noteSuffixes.Length)];
-                var note = isIncome ? "Thu nhập" : "Chi tiêu";
+                // Random salary between 25,000,000 - 30,000,000 VND
+                var amount = rng.Next(25000000, 30000001);
 
                 var transaction = new Transaction
                 {
-                    Id = 2000 + i,
+                    Id = 2000 + count,
                     Amount = amount,
-                    Note = note + " " + noteSuffix,
-                    IsIncome = isIncome,
-                    WalletId = walletId,
-                    CategoryId = categoryId,
-                    UserId = 2,  // This is for nguyenme892@gmail.com (UserId = 2)
-                    TransactionDate = date,
+                    Note = "Lương tháng " + date.Month,
+                    IsIncome = true,
+                    WalletId = 3,  // Tiền mặt
+                    CategoryId = 1,  // Lương
+                    UserId = 2,  // nguyenme892@gmail.com
+                    TransactionDate = transactionDate,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
 
                 modelBuilder.Entity<Transaction>().HasData(transaction);
                 count++;
+
+                date = date.AddMonths(1);
+            }
+
+            // Generate expense transactions (random per-category ranges)
+            var expenseCount = rng.Next(100, 201); // 100-200 expense transactions
+            for (var i = 0; i < expenseCount; i++)
+            {
+                // Random date within 2024-2026
+                var yearOffset = rng.Next(0, 3);
+                var month = rng.Next(1, 13);
+                var day = rng.Next(1, 29);
+                var expDate = new DateTime(2024 + yearOffset, month, day > 28 ? 28 : day);
+
+                // Random expense category
+                var categoryId = expenseCategories[rng.Next(expenseCategories.Length)];
+
+                // Random amount per category range
+                var amount = rng.Next(expenseRanges[categoryId].min, expenseRanges[categoryId].max + 1);
+
+                // Random wallet
+                var walletId = wallets[rng.Next(wallets.Length)];
+
+                // Random note
+                var noteSuffix = noteSuffixes[rng.Next(noteSuffixes.Length)];
+                var note = "Chi tiêu " + noteSuffix;
+
+                var transaction = new Transaction
+                {
+                    Id = 5000 + count + i,
+                    Amount = amount,
+                    Note = note,
+                    IsIncome = false,
+                    WalletId = walletId,
+                    CategoryId = categoryId,
+                    UserId = 2,
+                    TransactionDate = expDate,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                modelBuilder.Entity<Transaction>().HasData(transaction);
             }
         }
     }
